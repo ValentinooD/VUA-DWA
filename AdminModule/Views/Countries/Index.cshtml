@@ -1,0 +1,64 @@
+﻿
+@section head {
+    <link rel="stylesheet" href="~/css/countries-list.css" asp-append-version="true" />
+}
+
+<div id="container">
+</div>
+
+@section Scripts {
+    <script>
+        const PAGE_SIZE = 50;
+
+        function add(id, name) {
+            var TEXT =
+                "<div id=\"country-" + id + "\" class=\"country-container\">" +
+                "<p class=\"name\" > " + name + "</p>" +
+                "</div>";
+
+            $("#container").html($("#container").html() + TEXT);
+        }
+
+
+        var loadedAll = false;
+        var populating = false;
+        function populate(page = 0) {
+            if (populating) return;
+
+            populating = true;
+
+            $.ajax({
+                url: "@Url.Action("List", "Countries")",
+                type: "GET",
+                dataType: "json",
+                contentType: 'application/json; charset=utf-8',
+                data: {
+                    "page": page,
+                    "size": PAGE_SIZE
+                },
+                async: true,
+                success: function (msg) {
+                    for (var i = 0; i < msg.length; i++) {
+                        add(msg[i]["id"], msg[i]["name"]);
+                    }
+
+                    if (msg.length < PAGE_SIZE) loadedAll = true;
+
+                    populating = false;
+                }
+            });
+        }
+
+        populate();
+
+        $(window).scroll(function (evt) {
+            var count = $(".country-container").length;
+            var lastElem = $(".country-container")[count - 1];
+            if (isVisibleOnScreen(lastElem)) {
+                populate(Math.round(count / PAGE_SIZE));
+            }
+        });
+    </script>
+}
+
+

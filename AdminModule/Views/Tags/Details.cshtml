@@ -1,0 +1,17 @@
+﻿@using DAL.Models;
+@model Tag
+
+@section head {
+    <link rel="stylesheet" href="~/css/details.css" asp-append-version="true" / >
+}
+
+<div id="main-container">
+    <div id="content">
+        <p>Title: <span>@Model.Name</span></p>
+    </div>
+
+    <div id="controls">
+        <a class="btn btn-sm btn-danger" href="/tags/delete/@Model.Id">Delete</a>
+        <a class="btn btn-sm btn-info" href="/tags/edit/@Model.Id">Edit</a>
+    </div>
+</div>

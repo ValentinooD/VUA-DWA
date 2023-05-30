@@ -1,0 +1,35 @@
+﻿#controls {
+    margin-bottom: 20px;
+    height: 40px;
+}
+
+#controls > a {
+    display: block;
+    float: right;
+}
+
+.element-container {
+    border: 1px solid #808080;
+    border-radius: 8px;
+    margin-bottom: 4px;
+    padding: 16px;
+    height: 60px;
+}
+
+.element-container > #name {
+    width: 80%;
+    height: 32px;
+    float: left;
+}
+
+.element-container > .btn-container {
+    width: 20%;
+    height: 32px;
+    float: right;
+}
+
+.btn-container > .btn {
+    float: right;
+    display: block;
+    margin: 0 4px;
+}

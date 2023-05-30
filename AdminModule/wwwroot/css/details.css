@@ -1,0 +1,32 @@
+﻿#main-container {
+    border: 1px solid #808080;
+    border-radius: 8px;
+    padding: 16px;
+    height: 180px;
+}
+
+#content {
+    width: 90%;
+    float: left;
+
+}
+
+#content > p {
+
+}
+
+#content > p > span {
+    color: #404040;
+}
+
+#controls {
+    width: 10%;
+    float: right;
+
+}
+
+#controls > .btn {
+    float: right;
+    display: block;
+    margin: 0 4px;
+}

@@ -1,0 +1,52 @@
+﻿#controls {
+    margin-bottom: 20px;
+    height: 40px;
+}
+
+#controls > input {
+    width: 83.5%;
+    display: block;
+    margin: 0 8px 0 0;
+    border-radius: 8px;
+    float: left;
+    border: 1px solid #000;
+    padding: 6px;
+    
+}
+
+#controls > select {
+    width: 140px;
+    float: left;
+}
+
+#controls > a {
+    display: block;
+    float: right;
+
+}
+
+.video-container {
+    border: 1px solid #808080;
+    border-radius: 8px;
+    margin-bottom: 4px;
+    padding: 16px;
+    height: 64px;
+}
+
+.video-container > .video-name {
+    width: 80%;
+    height: 32px;
+    float: left;
+}
+
+.video-container > .btn-container {
+    width: 20%;
+    height: 32px;
+    float: right;
+}
+
+.btn-container > .btn {
+    float: right;
+    display: block;
+    margin: 0 4px;
+}

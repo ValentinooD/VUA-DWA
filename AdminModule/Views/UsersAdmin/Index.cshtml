@@ -1,0 +1,75 @@
+﻿@section head {
+    <link rel="stylesheet" href="~/css/tags-list.css" asp-append-version="true" />
+}
+
+
+<div id="controls">
+    <a class="btn btn-small btn-success" href="@Url.Action("Create", "Genres")">New</a>
+</div>
+
+
+<div id="container">
+</div>
+
+@section Scripts {
+    <script>
+        const PAGE_SIZE = 50;
+
+        function add(id, name) {
+            var TEXT =
+                "<div id=\"tag-" + id + "\" class=\"element-container\">" +
+                "<p id=\"name\" > " + name + "</p>" +
+                "<div class=\"btn-container\">" +
+                "<a class=\"btn btn-sm btn-danger\" href=\"@Url.Action("Delete", "Genres")/" + id + "\">Delete</a>" +
+                "<a class=\"btn btn-sm btn-info\" href=\"@Url.Action("Edit", "Genres")/" + id + "\">Edit</a>" +
+                "<a class=\"btn btn-sm btn-primary\" href=\"@Url.Action("Details", "Genres")/" + id + "\">Details</a>" +
+                "</div>" +
+                "</div>";
+
+            $("#container").html($("#container").html() + TEXT);
+        }
+
+
+        var loadedAll = false;
+        var populating = false;
+        function populate(page = 0) {
+            if (populating) return;
+
+            populating = true;
+
+            $.ajax({
+                url: "@Url.Action("List", "Genres")",
+                type: "GET",
+                dataType: "json",
+                contentType: 'application/json; charset=utf-8',
+                data: {
+                    "page": page,
+                    "size": PAGE_SIZE
+                },
+                async: true,
+                success: function (msg) {
+                    console.log(msg);
+
+                    for (var i = 0; i < msg.length; i++) {
+                        add(msg[i]["id"], msg[i]["name"]);
+                    }
+
+                    if (msg.length < PAGE_SIZE) loadedAll = true;
+
+                    populating = false;
+                }
+            });
+        }
+
+        populate();
+
+        $(window).scroll(function (evt) {
+            var count = $(".element-container").length;
+            var lastElem = $(".element-container")[count - 1];
+            if (isVisibleOnScreen(lastElem)) {
+                populate(Math.round(count / PAGE_SIZE));
+            }
+        });
+    </script>
+}
+

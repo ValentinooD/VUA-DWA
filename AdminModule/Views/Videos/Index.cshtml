@@ -1,0 +1,80 @@
+﻿
+@section head {
+    <link rel="stylesheet" href="~/css/videos-list.css" asp-append-version="true" / >   
+}
+
+<div id="controls">
+    <input id="search" type="text" placeholder="Search..">
+    <select id="select" class="form-select">
+        <option>Id</option>
+        <option>Name</option>
+        <option>Total time</option>
+    </select>
+    <a class="btn btn-small btn-success" href="/videos/create/">New</a>
+</div>
+
+<div id="videos-container">
+
+</div>
+
+@section Scripts {
+    <script>
+        const PAGE_SIZE = 50;
+
+        function add(id, name) {
+            var TEXT =
+                "<div id=\"video-" + id + "\" class=\"video-container\">" +
+                "<p class=\"video-name\" > " + name + "</p>" +
+                "<div class=\"btn-container\">" +
+                "<a class=\"btn btn-sm btn-danger\" href=\"@Url.Action("Delete", "Videos")/" + id + "\">Delete</a>" +
+                "<a class=\"btn btn-sm btn-info\" href=\"@Url.Action("Edit", "Videos")/" + id + "\">Edit</a>" +
+                "<a class=\"btn btn-sm btn-primary\" href=\"@Url.Action("Details", "Videos")/" + id + "\">Details</a>" +
+                "</div></div>";
+
+            $("#videos-container").html($("#videos-container").html() + TEXT);
+        }
+
+        var loadedAll = false;
+        var populating = false;
+        function populate(page = 0) {
+            if (populating) return;
+
+            populating = true;
+
+            $.ajax({
+                url: "@Url.Action("Search", "Videos")",
+                type: "GET",
+                dataType: "json",
+                contentType: 'application/json; charset=utf-8',
+                data: {
+                    "name": $("#search").val(),
+                    "page": page,
+                    "batchSize": PAGE_SIZE,
+                    "orderBy": $("#select").val()
+                },
+                async: true,
+                success: function (msg) {
+                    for (var i = 0; i < msg.length; i++) {
+                        add(msg[i]["id"], msg[i]["name"]);
+                    }
+
+                    if (msg.length < PAGE_SIZE) loadedAll = true;
+
+                    populating = false;
+                }
+            });
+        }
+
+        populate();
+
+        $(window).scroll(function (evt) {
+            var count = $(".video-container").length;
+            var lastElem = $(".video-container")[count - 1];
+            if (isVisibleOnScreen(lastElem)) {
+                populate(Math.round(count / PAGE_SIZE));
+            }
+        });
+    </script>
+}
+
+

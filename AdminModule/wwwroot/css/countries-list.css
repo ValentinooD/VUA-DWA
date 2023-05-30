@@ -1,0 +1,10 @@
+﻿.country-container {
+    border: 1px solid #808080;
+    border-radius: 8px;
+    margin-bottom: 4px;
+    padding: 16px;
+}
+
+.country-container > p {
+    margin: 0;
+}

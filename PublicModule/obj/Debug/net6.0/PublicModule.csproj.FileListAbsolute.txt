@@ -1,0 +1,8 @@
+D:\VUA\WEB\DWA\PublicModule\obj\Debug\net6.0\PublicModule.csproj.AssemblyReference.cache
+D:\VUA\WEB\DWA\PublicModule\obj\Debug\net6.0\PublicModule.GeneratedMSBuildEditorConfig.editorconfig
+D:\VUA\WEB\DWA\PublicModule\obj\Debug\net6.0\PublicModule.AssemblyInfoInputs.cache
+D:\VUA\WEB\DWA\PublicModule\obj\Debug\net6.0\PublicModule.AssemblyInfo.cs
+D:\VUA\WEB\DWA\PublicModule\obj\Debug\net6.0\PublicModule.csproj.CoreCompileInputs.cache
+D:\VUA\WEB\DWA\PublicModule\obj\Debug\net6.0\PublicModule.MvcApplicationPartsAssemblyInfo.cache
+D:\VUA\WEB\DWA\PublicModule\obj\Debug\net6.0\PublicModule.RazorAssemblyInfo.cache
+D:\VUA\WEB\DWA\PublicModule\obj\Debug\net6.0\PublicModule.RazorAssemblyInfo.cs
