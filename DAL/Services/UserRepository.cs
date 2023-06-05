@@ -4,6 +4,7 @@ using DAL.BLModels;
 using DAL.Models;
 using DAL.Models.Requests;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
@@ -16,7 +17,7 @@ namespace DAL.Services
 {
     public class UserRepository : IUserRepository
     {
-        private readonly Mapper mapper;
+        private readonly IMapper mapper;
         private readonly RwaMoviesContext ctx;
         private readonly IConfiguration configuration;
 
@@ -25,7 +26,7 @@ namespace DAL.Services
             var provider = factory.CreateScope().ServiceProvider;
             this.ctx = provider.GetRequiredService<RwaMoviesContext>();
             this.configuration = provider.GetRequiredService<IConfiguration>();
-            this.mapper = provider.GetRequiredService<Mapper>();
+            this.mapper = provider.GetRequiredService<IMapper>();
         }
 
         public BLUser Create(UserRegisterRequest request)
@@ -173,9 +174,9 @@ namespace DAL.Services
             return hash.SequenceEqual(calcHash);
         }
 
-        public List<BLUser> GetAll()
+        public IEnumerable<BLUser> GetAll()
         {
-            return (List<BLUser>)mapper.Map<List<BLUser>>(ctx.Users.ToList());
+            return (IEnumerable<BLUser>)mapper.Map<IEnumerable<BLUser>>(ctx.Users.ToList());
         }
 
         public void Edit(int id, BLUser user)
@@ -201,6 +202,104 @@ namespace DAL.Services
             dbUser.Email = user.Email;
             dbUser.CountryOfResidenceId = country.Id;
 
+            ctx.SaveChanges();
+        }
+
+        public BLUser GetUser(int id)
+        {
+            var dbUser = ctx.Users.FirstOrDefault(x => x.Id == id);
+            var blUser = mapper.Map<BLUser>(dbUser);
+
+            return blUser;
+        }
+
+        public void SoftDeleteUser(int id)
+        {
+            var dbUser = ctx.Users.FirstOrDefault(x => x.Id == id);
+            dbUser.DeletedAt = DateTime.UtcNow;
+
+            ctx.SaveChanges();
+        }
+
+        public bool CheckUsernameExists(string username)
+           => ctx.Users.Any(x => x.Username == username && x.DeletedAt == null);
+
+        public bool CheckEmailExists(string email)
+            => ctx.Users.Any(x => x.Email == email && x.DeletedAt == null);
+
+        public BLUser CreateUser(string username, string firstName, string lastName, string email, string password)
+        {
+            string hash;
+            string salt;
+            ComputeHashAndSalt(password, out salt, out hash); 
+            
+            byte[] securityToken = RandomNumberGenerator.GetBytes(256 / 8);
+            string b64SecToken = Convert.ToBase64String(securityToken);
+
+            // Create BLUser object
+            var dbUser = new User()
+            {
+                CreatedAt = DateTime.UtcNow,
+                Username = username,
+                FirstName = firstName,
+                LastName = lastName,
+                Email = email,
+                PwdHash = hash,
+                PwdSalt = salt,
+                SecurityToken = b64SecToken
+            };
+            ctx.Users.Add(dbUser);
+
+            ctx.SaveChanges();
+
+            var blUser = mapper.Map<BLUser>(dbUser);
+
+            return blUser;
+        }
+
+        public void ConfirmEmail(string email, string securityToken)
+        {
+            var target = ctx.Users.FirstOrDefault(x =>
+                x.Email == email && x.SecurityToken == securityToken);
+
+            if (target == null)
+                throw new InvalidOperationException("Authentication failed");
+
+            target.IsConfirmed = true;
+            ctx.SaveChanges();
+        }
+
+        public BLUser GetConfirmedUser(string username, string password)
+        {
+            var dbUser = ctx.Users.FirstOrDefault(x =>
+                x.Username == username &&
+                x.IsConfirmed == true);
+
+            string hash;
+            string salt;
+            ComputeHashAndSalt(password, out salt, out hash);
+
+            if (dbUser.PwdHash != hash)
+                return null;
+
+            var blUser = mapper.Map<BLUser>(dbUser);
+
+            return blUser;
+        }
+
+        public void ChangePassword(string username, string oldPassword, string newPassword)
+        {
+            if (!Authenticate(username, oldPassword))
+                throw new InvalidOperationException("Authentication failed");
+
+            string hash;
+            string salt;
+            ComputeHashAndSalt(newPassword, out salt, out hash);
+
+            // Update user
+            var target = ctx.Users.Single(x => x.Username == username);
+            target.PwdSalt = salt;
+            target.PwdHash = hash;
             ctx.SaveChanges();
         }
     }

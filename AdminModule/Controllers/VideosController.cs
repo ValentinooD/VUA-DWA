@@ -1,13 +1,12 @@
-﻿using AdminModule.Models.Requests;
-using AdminModule.ViewModel;
-using Azure.Core;
+﻿using AdminModule.ViewModel;
+using AutoMapper;
+using DAL.BLModels;
 using DAL.Models;
-using Microsoft.AspNetCore.Cors;
-using Microsoft.AspNetCore.Http;
+using DAL.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.SqlServer.Server;
+using System.Drawing;
 
 namespace AdminModule.Controllers
 {
@@ -16,69 +15,58 @@ namespace AdminModule.Controllers
     public class VideosController : Controller
     {
         private RwaMoviesContext ctx;
+        private IVideoRepository repo;
+        private IMapper mapper;
 
-        public VideosController(RwaMoviesContext ctx)
+        public VideosController(IVideoRepository repo, RwaMoviesContext ctx, IMapper mapper)
         {
             this.ctx = ctx;
+            this.repo = repo;
+            this.mapper = mapper;
         }
 
-        public ActionResult Index()
+        public ActionResult Index(int page, int size, string orderBy, string direction)
         {
-            ViewData["videos"] = ctx.Videos.ToList();
-            return View();
+            // Set up some default values
+            if (size == 0)
+                size = 10;
+
+            var videos = repo.GetPagedData(page, size, orderBy, direction);
+
+            ViewData["page"] = page;
+            ViewData["size"] = size;
+            ViewData["orderBy"] = orderBy;
+            ViewData["direction"] = direction;
+            ViewData["pages"] = repo.GetTotalCount() / size;
+
+            return View(videos);
         }
 
-        [HttpGet()]
-        public ActionResult<List<Video>> Search(string? name, int? page, int? size, string? orderBy)
+        public IActionResult PartialVideos(int page, int size, string orderBy, string direction)
         {
-            try
-            {
-                var videos = ctx.Videos.Where(x => true); // ToLower() because we ignore case;
+            // Set up some default values
+            if (size == 0)
+                size = 10;
 
-                if (!name.IsNullOrEmpty())
-                {
-                    videos = ctx.Videos.Where(x => x.Name.ToLower().Contains(name.ToLower())); // ToLower() because we ignore case
-                }
+            var list = repo.GetPagedData(page, size, orderBy, direction);
 
-                if (videos.IsNullOrEmpty())
-                {
-                    return StatusCode(StatusCodes.Status404NotFound);
-                }
+            ViewData["page"] = page;
+            ViewData["size"] = size;
+            ViewData["orderBy"] = orderBy;
+            ViewData["direction"] = direction;
+            ViewData["pages"] = repo.GetTotalCount() / size;
 
-                if (page.HasValue && size.HasValue)
-                {
-                    videos = videos.Skip(page.Value * size.Value).Take(size.Value);
-                }
-
-                if (!orderBy.IsNullOrEmpty())
-                {
-                    if (string.Compare(orderBy, "id", true) == 0)
-                    {
-                        videos = videos.OrderBy(x => x.Id);
-                    }
-                    else if (string.Compare(orderBy, "name", true) == 0)
-                    {
-                        videos = videos.OrderBy(x => x.Name);
-                    }
-                    else if (string.Compare(orderBy, "totalseconds", true) == 0)
-                    {
-                        videos = videos.OrderBy(x => x.TotalSeconds);
-                    }
-                }
-
-                return Ok(videos.ToList());
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
+            return PartialView("_PartialVideoEntry", list);
         }
 
         // GET: VideosController/Details/5
         public ActionResult Details(int id)
         {
-            ViewData["video"] = ctx.Videos.FirstOrDefault(x => x.Id == id);
-            return View();
+            var video = ctx.Videos.FirstOrDefault(x => x.Id == id);
+            if (video == null)
+                return NotFound();
+
+            return View(video);
         }
 
         // GET: VideosController/Create
@@ -91,7 +79,6 @@ namespace AdminModule.Controllers
 
         // POST: VideosController/Create
         [HttpPost]
-//        [ValidateAntiForgeryToken]
         //public ActionResult Create(IFormCollection collection)
         public IActionResult Create([FromForm] VMVideo request)
         {
@@ -103,7 +90,7 @@ namespace AdminModule.Controllers
                 var imageArray = GetFileByteAray(request.Image);
                 if (request.Image != null)
                 {
-                    Image image = new Image()
+                    DAL.Models.Image image = new DAL.Models.Image()
                     {
                         Content = Convert.ToBase64String(imageArray)
                     };

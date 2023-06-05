@@ -1,6 +1,10 @@
 ﻿#controls {
     margin-bottom: 20px;
-    height: 40px;
+    height: 80px;
+}
+
+.btn-group {
+    margin-top: 8px;
 }
 
 #controls > input {

@@ -1,7 +1,5 @@
 ﻿@using DAL.Models;
-@{
-    Video video = ViewData["video"] as Video;
-}
+@model Video
 
 @section head {
     <link rel="stylesheet" href="~/css/videos-details.css" asp-append-version="true" / >
@@ -9,14 +7,14 @@
 
 <div id="video-container">
     <div id="content">
-        <p>Title: <span>@video.Name</span></p>
-        <p><span>@video.Description</span></p>
-        <p>Genre: <span>@video.Genre</span></p>
-        <p>Duration: <span>@video.GetPrettyTotalTime()</span></p>
+        <p>Title: <span>@Model.Name</span></p>
+        <p><span>@Model.Description</span></p>
+        <p>Genre: <span>@Model.Genre</span></p>
+        <p>Duration: <span>@Model.GetPrettyTotalTime()</span></p>
     </div>
 
     <div id="controls">
-        <a class="btn btn-sm btn-danger" href="/videos/delete/@video.Id">Delete</a>
-        <a class="btn btn-sm btn-info" href="/videos/edit/@video.Id">Edit</a>
+        <a class="btn btn-sm btn-danger" href="/videos/delete/@Model.Id">Delete</a>
+        <a class="btn btn-sm btn-info" href="/videos/edit/@Model.Id">Edit</a>
     </div>
 </div>

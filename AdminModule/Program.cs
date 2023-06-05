@@ -1,4 +1,6 @@
+using DAL.Mappers;
 using DAL.Models;
+using DAL.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,14 +12,15 @@ builder.Services.AddDbContext<RwaMoviesContext>(options =>
 {
     options.UseSqlServer("name=ConnectionStrings:RWAConnStr");
 });
-builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
-builder.Services.AddCors(o => o.AddPolicy("API", builder =>
-{
-    builder.AllowAnyOrigin()
-           .AllowAnyMethod()
-           .AllowAnyHeader();
-}));
+//builder.Services.AddAutoMapper(typeof(Program).Assembly);
+builder.Services.AddAutoMapper(
+    typeof(Program),
+    typeof(DAL.Mappers.AutomapperProfile),
+    typeof(AdminModule.Mappers.AutomapperProfile));
+
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IVideoRepository, VideoRepository>();
 
 var app = builder.Build();
 

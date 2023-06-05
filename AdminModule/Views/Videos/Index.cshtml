@@ -1,4 +1,11 @@
-﻿
+﻿@{
+    var page = (int)ViewData["page"];
+    var size = (int)ViewData["size"];
+    var orderBy = (string)ViewData["orderBy"];
+    var direction = (string)ViewData["direction"];
+    var pages = (int)ViewData["pages"];
+}
+
 @section head {
     <link rel="stylesheet" href="~/css/videos-list.css" asp-append-version="true" / >   
 }
@@ -10,69 +17,58 @@
         <option>Name</option>
         <option>Total time</option>
     </select>
-    <a class="btn btn-small btn-success" href="/videos/create/">New</a>
+    <a class="btn btn-small btn-success" asp-action="Create">New</a>
+
+    <div class="btn-group">
+        @for (var i = 0; i <= pages; i++)
+        {
+            var currClass = page == i ? "btn-primary" : "btn-outline-primary";
+
+            <a asp-action="Index"
+               asp-route-page="@i"
+               asp-route-size="@size"
+               asp-route-orderBy="@orderBy"
+               asp-route-direction="@direction"
+               data-page="@i"
+               class="pager-btn btn @currClass">@(i + 1)</a>
+        }
+    </div>
 </div>
 
 <div id="videos-container">
-
+    <partial name="_PartialVideoEntry" />
 </div>
 
 @section Scripts {
     <script>
-        const PAGE_SIZE = 50;
+        $(".pager-btn").click(function (event) {
+            event.preventDefault();
+            var page = $(this).data("page");
 
-        function add(id, name) {
-            var TEXT =
-                "<div id=\"video-" + id + "\" class=\"video-container\">" +
-                "<p class=\"video-name\" > " + name + "</p>" +
-                "<div class=\"btn-container\">" +
-                "<a class=\"btn btn-sm btn-danger\" href=\"@Url.Action("Delete", "Videos")/" + id + "\">Delete</a>" +
-                "<a class=\"btn btn-sm btn-info\" href=\"@Url.Action("Edit", "Videos")/" + id + "\">Edit</a>" +
-                "<a class=\"btn btn-sm btn-primary\" href=\"@Url.Action("Details", "Videos")/" + id + "\">Details</a>" +
-                "</div></div>";
-
-            $("#videos-container").html($("#videos-container").html() + TEXT);
-        }
-
-        var loadedAll = false;
-        var populating = false;
-        function populate(page = 0) {
-            if (populating) return;
-
-            populating = true;
+            var ajaxData = {
+                page: page,
+                size: @size,
+                orderBy: "@orderBy",
+                direction: "@direction"
+            };
 
             $.ajax({
-                url: "@Url.Action("Search", "Videos")",
                 type: "GET",
-                dataType: "json",
-                contentType: 'application/json; charset=utf-8',
-                data: {
-                    "name": $("#search").val(),
-                    "page": page,
-                    "batchSize": PAGE_SIZE,
-                    "orderBy": $("#select").val()
+                url: "@Url.Action("PartialVideos", "Videos")",
+                data: ajaxData,
+                success: function (data) {
+                    $("#videos-container").html(data);
+
+                    $(".pager-btn").removeClass("btn-primary");
+                    $(".pager-btn").addClass("btn-outline-primary");
+
+                    $(".pager-btn[data-page=" + page + "]").removeClass("btn-outline-primary");
+                    $(".pager-btn[data-page=" + page + "]").addClass("btn-primary");
                 },
-                async: true,
-                success: function (msg) {
-                    for (var i = 0; i < msg.length; i++) {
-                        add(msg[i]["id"], msg[i]["name"]);
-                    }
-
-                    if (msg.length < PAGE_SIZE) loadedAll = true;
-
-                    populating = false;
+                error: function (data) {
+                    console.error("Ajax GET error", data);
                 }
             });
-        }
-
-        populate();
-
-        $(window).scroll(function (evt) {
-            var count = $(".video-container").length;
-            var lastElem = $(".video-container")[count - 1];
-            if (isVisibleOnScreen(lastElem)) {
-                populate(Math.round(count / PAGE_SIZE));
-            }
         });
     </script>
 }

@@ -2,7 +2,7 @@
 using AutoMapper;
 using DAL.Models;
 
-namespace Task11.Mappers
+namespace AdminModule.Mappers
 {
     public class AutomapperProfile : Profile
     {

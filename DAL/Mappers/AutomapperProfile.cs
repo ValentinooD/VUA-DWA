@@ -2,13 +2,14 @@
 using DAL.BLModels;
 using DAL.Models;
 
-namespace Task11.Mappers
+namespace DAL.Mappers
 {
     public class AutomapperProfile : Profile
     {
         public AutomapperProfile()
         {
             CreateMap<User, BLUser>();
+            CreateMap<Video, BLVideo>();
         }
     }
 }
