@@ -10,6 +10,8 @@ namespace PublicModule.Mappers
         public AutomapperProfile()
         {
             CreateMap<BLUser, VMUser>();
+            CreateMap<Video, VMVideo>();
+            CreateMap<BLVideo, VMVideo>();
         }
     }
 }

@@ -24,5 +24,7 @@ namespace AdminModule.ViewModel
 
         [Required]
         public string CountryCode { get; set; }
+
+
     }
 }

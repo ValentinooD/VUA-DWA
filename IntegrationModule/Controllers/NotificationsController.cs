@@ -22,6 +22,12 @@ namespace IntegrationModule.Controllers
         }
 
         [HttpGet("[action]")]
+        public ActionResult<int> GetUnsentCount()
+        {
+            return Ok(ctx.Notifications.Where(x => x.SentAt == null).Count());
+        }
+
+        [HttpGet("[action]")]
         public ActionResult<IEnumerable<NotificationResponse>> GetAll()
         {
             try

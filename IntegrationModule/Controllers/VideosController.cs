@@ -47,7 +47,7 @@ namespace IntegrationModule.Controllers
             }
         }
 
-        [HttpPost()]
+        [HttpPost("[action]")]
         public ActionResult<Video> Create([FromBody] VideoCreateRequest request)
         {
             try
@@ -83,7 +83,7 @@ namespace IntegrationModule.Controllers
             }
         }
 
-        [HttpPost()]
+        [HttpPost("[action]")]
         public ActionResult<Video> Edit(int id, [FromBody] VideoCreateRequest request)
         {
             try

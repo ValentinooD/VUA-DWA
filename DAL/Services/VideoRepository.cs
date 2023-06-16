@@ -36,6 +36,27 @@ namespace DAL.Services
             return blVideos;
         }
 
+        public IEnumerable<BLVideo> GetPagedAndSearchedData(int page, int size, string search)
+        {
+            IEnumerable<Video> list;
+
+            if (string.IsNullOrEmpty(search))
+            {
+                list = ctx.Videos;
+            } else
+            {
+                list = ctx.Videos.Where(x => x.Name.ToLower().Contains(search.ToLower()));
+            }
+
+            /*if (!string.IsNullOrEmpty(search))
+                list = list.Where(x => x.Name.ToLower().Contains(search.ToLower())); */
+
+            list = list.Skip(page * size).Take(size);
+            var blVideos = mapper.Map<IEnumerable<BLVideo>>(list);
+
+            return blVideos;
+        }
+
         public IEnumerable<BLVideo> GetPagedData(int page, int size, string orderBy, string direction)
         {
             // All of this should go to repository

@@ -1,0 +1,91 @@
+﻿@model IEnumerable<PublicModule.ViewModels.VMVideo>
+
+@{
+    ViewData["Title"] = "Videos";
+
+    var page = (int)ViewData["page"];
+    var size = (int)ViewData["size"];
+    var search = (string)ViewData["search"];
+    var pages = (int)ViewData["pages"];
+}
+
+<div id="controls">
+    <input id="search" type="text" placeholder="Search.." value="@search">
+    <a id="btn-search" class="btn btn-small btn-success">Search</a>
+    
+    <div class="btn-group">
+        @for (var i = 0; i <= pages; i++)
+        {
+            var currClass = page == i ? "btn-primary" : "btn-outline-primary";
+
+            <a asp-action="Index"
+               asp-route-page="@i"
+               asp-route-size="@size"
+               data-page="@i"
+               class="pager-btn btn @currClass">@(i + 1)</a>
+        }
+    </div>
+</div>
+
+<section>
+    <div id="container">
+        <partial name="_PartialVideoEntry" />
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        $("#btn-search").click(function(event) {
+            event.preventDefault();
+
+            var ajaxData = {
+                page: @ViewData["page"],
+                size: @size,
+                search: $("#search").val()
+            };
+
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("PagedVideos", "Video")",
+                data: ajaxData,
+                success: function (data) {
+                    console.log(data);
+                    $("#container").html(data);
+                },
+                error: function (data) {
+                    console.error("Ajax GET error", data);
+                }
+            });
+        });
+
+        $(".pager-btn").click(function (event) {
+            event.preventDefault();
+            var page = $(this).data("page");
+
+            var ajaxData = {
+                page: page,
+                size: @size,
+                search: $("#search").val()
+            };
+
+            $.ajax({
+                type: "GET",
+                url: "@Url.Action("PagedVideos", "Video")",
+                data: ajaxData,
+                success: function (data) {
+                    console.log(data);
+                    $("#container").html(data);
+
+                    $(".pager-btn").removeClass("btn-primary");
+                    $(".pager-btn").addClass("btn-outline-primary");
+
+                    $(".pager-btn[data-page=" + page + "]").removeClass("btn-outline-primary");
+                    $(".pager-btn[data-page=" + page + "]").addClass("btn-primary");
+                },
+                error: function (data) {
+                    console.error("Ajax GET error", data);
+                }
+            });
+        });
+    </script>
+}

@@ -1,4 +1,4 @@
-﻿namespace DAL.Controllers
+﻿namespace DAL.Models.Responses
 {
     public class UserRegisterResponse
     {

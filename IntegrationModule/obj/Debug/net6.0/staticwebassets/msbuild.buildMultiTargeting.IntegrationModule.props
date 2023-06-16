@@ -1,3 +1,0 @@
-﻿<Project>
-  <Import Project="..\build\IntegrationModule.props" />
-</Project>

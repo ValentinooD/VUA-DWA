@@ -1,0 +1,36 @@
+﻿@using PublicModule.ViewModels;
+@model VMVideo
+
+<section>
+    <div id="video-container">
+        <div id="video">
+            @if (@Model.Image != null)
+            {
+                <img src="data:image/png;base64,@Model.Image.Content" alt="Image" width="300" height="300" />
+            }
+            else
+            {
+                <img src="/img/none.png" class="card-img-top img-fluid">
+            }
+        </div>
+
+        <p id="name">@Model.Name <span>@Model.Genre.Name</span></p>
+
+        <p id="description">@Model.Description</p>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        $("#video").click(function (event) {
+            event.preventDefault();
+            
+            var url = "@Model.StreamingUrl";
+        
+            alert(url);
+            window.location.href = "@Model.StreamingUrl";
+        
+        
+        });
+    </script>
+}

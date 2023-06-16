@@ -1,5 +1,6 @@
 ﻿using AdminModule.ViewModel;
 using AutoMapper;
+using DAL.BLModels;
 using DAL.Models;
 
 namespace AdminModule.Mappers
@@ -9,6 +10,8 @@ namespace AdminModule.Mappers
         public AutomapperProfile()
         {
             CreateMap<Video, VMVideo>();
+            CreateMap<BLUser, VMUser>();
+            CreateMap<VMUser, BLUser>();
         }
     }
 }

@@ -1,0 +1,37 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+    </head>
+    
+    <body>
+        <input type="button" value="Send unsent notifications" onclick="sendNotifications(this)" />
+        <input type="button" value="Get unsent notifications count" onclick="getNotificationCount(this)" />
+
+        <p id="notif-count">Count: <span>-</span></p>
+
+
+        <script>
+            function sendNotifications(btn) {
+                var req = new XMLHttpRequest();
+                req.open("POST", "/api/Notifications/SendAllNotifications", false);
+                req.send(null);
+
+                getNotificationCount(null);
+
+                alert("Sent unsent notifications!");
+            }
+
+            function getNotificationCount(btn) {
+
+                var req = new XMLHttpRequest();
+                req.open("GET", "/api/Notifications/GetUnsentCount", false);
+                req.send(null);
+
+                document.querySelector("#notif-count>span").innerText = req.responseText
+            }
+
+        </script>
+    </body>
+</html>
+
+

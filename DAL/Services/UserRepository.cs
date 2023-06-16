@@ -153,11 +153,11 @@ namespace DAL.Services
             hash = b64Hash;
         }
 
-        private bool Authenticate(string username, string password)
+        public bool Authenticate(string username, string password)
         {
             var target = ctx.Users.Single(x => x.Username == username);
 
-            if (!target.IsConfirmed)
+            if (!target.IsConfirmed || target.DeletedAt != null)
                 return false;
 
             byte[] salt = Convert.FromBase64String(target.PwdSalt);
@@ -222,12 +222,12 @@ namespace DAL.Services
         }
 
         public bool CheckUsernameExists(string username)
-           => ctx.Users.Any(x => x.Username == username && x.DeletedAt == null);
+           => ctx.Users.Any(x => x.Username.Equals(username) && x.DeletedAt == null);
 
         public bool CheckEmailExists(string email)
-            => ctx.Users.Any(x => x.Email == email && x.DeletedAt == null);
+            => ctx.Users.Any(x => x.Email.Equals(email) && x.DeletedAt == null);
 
-        public BLUser CreateUser(string username, string firstName, string lastName, string email, string password)
+        public BLUser CreateUser(string username, string firstName, string lastName, string email, string password, int countryId)
         {
             string hash;
             string salt;
@@ -246,7 +246,8 @@ namespace DAL.Services
                 Email = email,
                 PwdHash = hash,
                 PwdSalt = salt,
-                SecurityToken = b64SecToken
+                SecurityToken = b64SecToken,
+                CountryOfResidenceId = countryId
             };
             ctx.Users.Add(dbUser);
 
@@ -260,7 +261,7 @@ namespace DAL.Services
         public void ConfirmEmail(string email, string securityToken)
         {
             var target = ctx.Users.FirstOrDefault(x =>
-                x.Email == email && x.SecurityToken == securityToken);
+                x.Email.Equals(email) && x.SecurityToken.Equals(securityToken));
 
             if (target == null)
                 throw new InvalidOperationException("Authentication failed");
@@ -272,14 +273,12 @@ namespace DAL.Services
         public BLUser GetConfirmedUser(string username, string password)
         {
             var dbUser = ctx.Users.FirstOrDefault(x =>
-                x.Username == username &&
+                x.Username.Equals(username) &&
                 x.IsConfirmed == true);
 
-            string hash;
-            string salt;
-            ComputeHashAndSalt(password, out salt, out hash);
+            if (dbUser == null) return null;
 
-            if (dbUser.PwdHash != hash)
+            if (!Authenticate(username, password))
                 return null;
 
             var blUser = mapper.Map<BLUser>(dbUser);
@@ -287,11 +286,8 @@ namespace DAL.Services
             return blUser;
         }
 
-        public void ChangePassword(string username, string oldPassword, string newPassword)
+        public void ChangePassword(string username, string newPassword)
         {
-            if (!Authenticate(username, oldPassword))
-                throw new InvalidOperationException("Authentication failed");
-
             string hash;
             string salt;
             ComputeHashAndSalt(newPassword, out salt, out hash);

@@ -16,3 +16,85 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+.services-card {
+    width: 18rem;
+}
+
+.services-img-window {
+    height: 200px;
+    overflow: hidden;
+}
+
+.services-img-window img {
+    transition: transform .5s ease;
+}
+
+.services-img-window img:hover {
+    transform: scale(1.2);
+}
+
+#controls {
+    margin-bottom: 20px;
+    height: 80px;
+}
+
+.btn-group {
+    margin-top: 8px;
+}
+
+#controls > input {
+    width: 83.5%;
+    display: block;
+    margin: 0 8px 0 0;
+    border-radius: 8px;
+    float: left;
+    border: 1px solid #000;
+    padding: 6px;
+}
+
+#controls > select {
+    width: 140px;
+    float: left;
+}
+
+#controls > a {
+    display: block;
+    float: right;
+}
+
+#video-container {
+    margin: auto;
+    width: 820px;
+}
+
+#video {
+    margin: auto;
+    display: block;
+    width: 820px;
+    height: 640px;
+    border: 1px solid #000;
+}
+
+#video > img {
+    display: block;
+    width: 820px;
+    height: 640px;
+}
+
+#name {
+    margin: 8px 0;
+    font-size: 1.3em;
+}
+
+#name > span {
+    background-color: #0026ff;
+    border-radius: 8px;
+    color: #fff;
+    padding: 0 6px;
+    margin-left: 12px;
+}
+
+#description {
+    color: #808080;
+}

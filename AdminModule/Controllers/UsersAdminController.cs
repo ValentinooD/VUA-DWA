@@ -1,4 +1,5 @@
 ﻿using AdminModule.ViewModel;
+using AutoMapper;
 using DAL.BLModels;
 using DAL.Models;
 using DAL.Models.Requests;
@@ -6,22 +7,28 @@ using DAL.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Win32;
+using PublicModule.ViewModels;
 
 namespace AdminModule.Controllers
 {
     public class UsersAdminController : Controller
     {
+        private RwaMoviesContext ctx;
         private IUserRepository userRepo;
+        private IMapper mapper;
 
-        public UsersAdminController(IUserRepository userRepo)
-        { 
+        public UsersAdminController(RwaMoviesContext ctx, IUserRepository userRepo, IMapper mapper)
+        {
+            this.ctx = ctx;
             this.userRepo = userRepo;
+            this.mapper = mapper;
         }
 
         // GET: UsersController
         public ActionResult Index()
         {
-            return View();
+            return View(userRepo.GetAll());
         }
 
         [HttpGet()]
@@ -73,38 +80,41 @@ namespace AdminModule.Controllers
         // POST: UsersController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Create([FromForm] UserRegisterRequest form)
+        public ActionResult Create(VMCreate form)
         {
-            try
-            {
-                BLUser user = userRepo.Create(form);
-                userRepo.ValidateEmail(new ValidateEmailRequest()
-                {
-                    Username = form.Username,
-                    B64SecToken = user.SecurityToken
-                });
+            if (!ModelState.IsValid)
+                return View(form);
 
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            int countryId = ctx.Countries.FirstOrDefault(x => x.Name.Equals(form.CountryName)).Id;
+
+            var user = userRepo.CreateUser(
+                form.Username,
+                form.FirstName,
+                form.LastName,
+                form.Email,
+                form.Password,
+                countryId);
+
+            user.IsConfirmed = true;
+            ctx.SaveChanges();
+
+            return RedirectToAction("Index");
         }
 
         // GET: UsersController/Edit/5
         public ActionResult Edit(int id)
         {
-            return View();
+            return View(userRepo.GetUser(id));
         }
 
         // POST: UsersController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public ActionResult Edit(int id, VMUser user)
         {
             try
             {
+                userRepo.Edit(id, mapper.Map<BLUser>(user));
                 return RedirectToAction(nameof(Index));
             }
             catch
@@ -116,7 +126,7 @@ namespace AdminModule.Controllers
         // GET: UsersController/Delete/5
         public ActionResult Delete(int id)
         {
-            return View();
+            return View(userRepo.GetUser(id));
         }
 
         // POST: UsersController/Delete/5
@@ -126,6 +136,7 @@ namespace AdminModule.Controllers
         {
             try
             {
+                userRepo.SoftDeleteUser(id);
                 return RedirectToAction(nameof(Index));
             }
             catch

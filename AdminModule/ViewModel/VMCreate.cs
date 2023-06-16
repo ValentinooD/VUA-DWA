@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace PublicModule.ViewModels
 {
-    public class VMRegister
+    public class VMCreate
     {
         [DisplayName("User name")]
         public string Username { get; set; }

@@ -13,6 +13,7 @@ namespace DAL.Services
         IEnumerable<BLVideo> GetAll();
         IEnumerable<BLVideo> GetFilteredData(string term);
         IEnumerable<BLVideo> GetPagedData(int page, int size, string orderBy, string direction);
+        IEnumerable<BLVideo> GetPagedAndSearchedData(int page, int size, string search);
         int GetTotalCount();
     }
 }

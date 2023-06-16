@@ -1,0 +1,37 @@
+﻿@model IEnumerable<PublicModule.ViewModels.VMVideo>
+@{
+    int cardsPerRow = 4;
+    int numRows = Model.Count() / cardsPerRow;
+
+    if (Model.Count() < cardsPerRow)
+    {
+        numRows = 1;
+    }
+}
+
+<hr />
+@for (var i = 0; i < numRows; i++)
+{
+    <div class="row p-4 justify-content-around">
+        @foreach (var item in Model.Skip(i * cardsPerRow).Take(cardsPerRow))
+        {
+            <div class="card col-4 services-card">
+                <div class="services-img-window">
+                    @if (item.Image != null)
+                    {
+                        <img src="data:image/png;base64,@item.Image.Content" alt="Image" width="300" height="300" />
+                    }
+                    else
+                    {
+                        <img src="/img/none.png" class="card-img-top img-fluid">
+                    }
+                </div>
+                <div class="card-body">
+                    <h3 class="card-title">@item.Name</h3>
+                    <p class="card-text">@item.Description</p>
+                    <a class="btn btn-secondary" href="@Url.Action("Watch", "Video")/@item.Id">Watch</a>
+                </div>
+            </div>
+        }
+    </div>
+}

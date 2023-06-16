@@ -12,8 +12,7 @@ public partial class RwaMoviesContext : DbContext
 
     public RwaMoviesContext(DbContextOptions<RwaMoviesContext> options)
         : base(options)
-    {
-    }
+    { }
 
     public virtual DbSet<Country> Countries { get; set; }
 

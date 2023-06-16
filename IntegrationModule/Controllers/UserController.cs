@@ -1,8 +1,8 @@
-﻿using DAL.Controllers;
-using DAL.Models.Requests;
+﻿using DAL.Models.Requests;
 using DAL.Models;
 using DAL.Services;
 using Microsoft.AspNetCore.Mvc;
+using DAL.Models.Responses;
 
 namespace IntegrationModule.Controllers
 {

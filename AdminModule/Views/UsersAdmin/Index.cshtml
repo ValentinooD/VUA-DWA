@@ -1,75 +1,94 @@
-﻿@section head {
-    <link rel="stylesheet" href="~/css/tags-list.css" asp-append-version="true" />
+﻿@model IEnumerable<DAL.BLModels.BLUser>
+
+@{
+    ViewData["Title"] = "Index";
 }
 
+<h1>Index</h1>
 
-<div id="controls">
-    <a class="btn btn-small btn-success" href="@Url.Action("Create", "Genres")">New</a>
-</div>
-
-
-<div id="container">
-</div>
-
-@section Scripts {
-    <script>
-        const PAGE_SIZE = 50;
-
-        function add(id, name) {
-            var TEXT =
-                "<div id=\"tag-" + id + "\" class=\"element-container\">" +
-                "<p id=\"name\" > " + name + "</p>" +
-                "<div class=\"btn-container\">" +
-                "<a class=\"btn btn-sm btn-danger\" href=\"@Url.Action("Delete", "Genres")/" + id + "\">Delete</a>" +
-                "<a class=\"btn btn-sm btn-info\" href=\"@Url.Action("Edit", "Genres")/" + id + "\">Edit</a>" +
-                "<a class=\"btn btn-sm btn-primary\" href=\"@Url.Action("Details", "Genres")/" + id + "\">Details</a>" +
-                "</div>" +
-                "</div>";
-
-            $("#container").html($("#container").html() + TEXT);
-        }
-
-
-        var loadedAll = false;
-        var populating = false;
-        function populate(page = 0) {
-            if (populating) return;
-
-            populating = true;
-
-            $.ajax({
-                url: "@Url.Action("List", "Genres")",
-                type: "GET",
-                dataType: "json",
-                contentType: 'application/json; charset=utf-8',
-                data: {
-                    "page": page,
-                    "size": PAGE_SIZE
-                },
-                async: true,
-                success: function (msg) {
-                    console.log(msg);
-
-                    for (var i = 0; i < msg.length; i++) {
-                        add(msg[i]["id"], msg[i]["name"]);
-                    }
-
-                    if (msg.length < PAGE_SIZE) loadedAll = true;
-
-                    populating = false;
-                }
-            });
-        }
-
-        populate();
-
-        $(window).scroll(function (evt) {
-            var count = $(".element-container").length;
-            var lastElem = $(".element-container")[count - 1];
-            if (isVisibleOnScreen(lastElem)) {
-                populate(Math.round(count / PAGE_SIZE));
-            }
-        });
-    </script>
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Id)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreatedAt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DeletedAt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Username)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LastName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Phone)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.IsConfirmed)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SecurityToken)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CountryOfResidenceId)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Id)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CreatedAt)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DeletedAt)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Username)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.FirstName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.LastName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Phone)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.IsConfirmed)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SecurityToken)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CountryOfResidenceId)
+            </td>
+            <td>
+                @Html.ActionLink("Edit", "Edit", new {  id=item.Id }) |
+                @Html.ActionLink("Delete", "Delete", new {  id=item.Id })
+            </td>
+        </tr>
 }
-
+    </tbody>
+</table>
